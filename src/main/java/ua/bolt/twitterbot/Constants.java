@@ -27,8 +27,5 @@ public class Constants {
     public static final int RATE_UPDATING_PERIOD_BLACKMARKET    = 30 * 60 * 1000; // 30 mins
     public static final int RATE_SLEEPING_PERIOD                = 60 * 60 * 1000; // 1 hour
 
-    public static final int BANK_WORKING_TIME_FROM  = 9;
-    public static final int BANK_WORKING_TIME_TO    = 17;
-
     public static final int CRASHES_LIMIT = 3;
 }

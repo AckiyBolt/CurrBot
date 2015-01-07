@@ -74,7 +74,7 @@ public class Worker implements Runnable {
 
             Market market = miner.mineRates();
 
-            if (market != null) {
+            if (market != null && market.isFull()) {
                 printMarket(market);
 
                 previousMarket = market;

@@ -45,7 +45,7 @@ public class Main {
                     new Thread(interbankMarket).start();
                 }
 
-//                Thread.sleep(10*60*1000);
+//                Thread.sleep(60*60*1000);
 //
 //            } catch (Exception ex) {
 //                isAlive = false;

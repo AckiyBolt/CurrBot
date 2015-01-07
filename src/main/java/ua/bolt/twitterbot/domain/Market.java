@@ -18,6 +18,10 @@ public class Market {
         this.rub = rub;
     }
 
+    public boolean isFull() {
+        return type != null && eur != null && usd != null && rub != null;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
