@@ -19,39 +19,20 @@ public class Main {
     public static final AbstractPrinter printer = Constants.IS_DEBUUG ? new ConsolePrinter() : new TwitterPrinter();
     private static Logger LOG = Logger.getLogger(Main.class);
 
-    private static volatile boolean isAlive = Constants.IS_DEBUUG ? false : true;
-
     public static void main(String[] args) {
 
-        Worker blackMarket       = null;
-        Worker interbankOff      = null;
-        Worker interbankMarket   = null;
+        LOG.info("Bot starting...");
 
-//        do {
-//
-//            try {
-                if (blackMarket == null || (!blackMarket.isAlive && !Constants.IS_DEBUUG)) {
-                    blackMarket = createBlackMarketWorker();
-                    new Thread(blackMarket).start();
-                }
+        startThread(createBlackMarketWorker());
+        startThread(createInterbankWorker());
+        startThread(createInterbankMarketWorker());
 
-                if (interbankOff == null || (!interbankOff.isAlive && !Constants.IS_DEBUUG)) {
-                    interbankOff = createInterbankWorker();
-                    new Thread(interbankOff).start();
-                }
+        LOG.info("Threads has been started.");
+    }
 
-                if (interbankMarket == null || (!interbankMarket.isAlive && !Constants.IS_DEBUUG)) {
-                    interbankMarket = createInterbankMarketWorker();
-                    new Thread(interbankMarket).start();
-                }
-
-//                Thread.sleep(60*60*1000);
-//
-//            } catch (Exception ex) {
-//                isAlive = false;
-//            }
-//
-//        } while(isAlive);
+    private static void startThread(Worker worker) {
+        if (worker != null)
+            new Thread(worker).start();
     }
 
     private static Worker createBlackMarketWorker() {
