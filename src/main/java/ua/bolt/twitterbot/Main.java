@@ -4,6 +4,7 @@ import twitter4j.Logger;
 import ua.bolt.twitterbot.miner.BlackMarketMiner;
 import ua.bolt.twitterbot.miner.InterbankMarketMiner;
 import ua.bolt.twitterbot.miner.InterbankOffMiner;
+import ua.bolt.twitterbot.miner.NbuMiner;
 import ua.bolt.twitterbot.print.AbstractPrinter;
 import ua.bolt.twitterbot.print.ConsolePrinter;
 import ua.bolt.twitterbot.print.TwitterPrinter;
@@ -25,7 +26,8 @@ public class Main {
 
         startThread(createBlackMarketWorker());
         startThread(createInterbankWorker());
-        startThread(createInterbankMarketWorker());
+        //startThread(createInterbankMarketWorker());
+        startThread(createNbuWorker());
 
         LOG.info("Threads has been started.");
     }
@@ -75,6 +77,21 @@ public class Main {
                         5, // fr
                         10,
                         17,
+                        Constants.RATE_UPDATING_PERIOD_INTERBANK,
+                        Constants.RATE_SLEEPING_PERIOD
+                ));
+    }
+
+    private static Worker createNbuWorker() {
+        return new Worker(
+                new NbuMiner(),
+                printer,
+                new CacheManager(Constants.CACHE_FILE_NBU),
+                new Morpheus(
+                        1, // mo
+                        5, // fr
+                        12,
+                        14,
                         Constants.RATE_UPDATING_PERIOD_INTERBANK,
                         Constants.RATE_SLEEPING_PERIOD
                 ));

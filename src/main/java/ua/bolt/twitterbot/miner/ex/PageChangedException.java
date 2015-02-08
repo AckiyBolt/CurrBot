@@ -8,4 +8,8 @@ public class PageChangedException extends RuntimeException {
     public PageChangedException() {
         super("Styles has been changed! Fix me blyat'!");
     }
+
+    public PageChangedException(String msg) {
+        super(msg);
+    }
 }

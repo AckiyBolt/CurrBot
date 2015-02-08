@@ -15,6 +15,11 @@ public class Util {
         return formatDouble(val);
     }
 
+    public static double parseDivideAndFormatDouble(String value, double divider) {
+        double val = Double.valueOf(value);
+        return formatDouble(val / divider);
+    }
+
     public static boolean isExist(String str) {
         return str != null && str.length() > 2;
     }

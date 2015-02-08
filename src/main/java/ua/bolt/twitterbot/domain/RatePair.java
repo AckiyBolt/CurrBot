@@ -18,15 +18,17 @@ public class RatePair {
     public Growing getGrowing (RatePair that) {
         Growing result = null;
 
-        double thisMiddle = (this.buy.value + this.sell.value) / 2.0;
-        double thatMiddle = (that.buy.value + that.sell.value) / 2.0;
+        if (that != null) {
+            double thisMiddle = (this.buy.value + this.sell.value) / 2.0;
+            double thatMiddle = (that.buy.value + that.sell.value) / 2.0;
 
-        if (thisMiddle > thatMiddle)
-            result = Growing.UP;
-        else if (thisMiddle < thatMiddle)
-            result = Growing.DOWN;
-        else
-            result = Growing.SAME;
+            if (thisMiddle > thatMiddle)
+                result = Growing.UP;
+            else if (thisMiddle < thatMiddle)
+                result = Growing.DOWN;
+            else
+                result = Growing.SAME;
+        }
 
         return result;
     }

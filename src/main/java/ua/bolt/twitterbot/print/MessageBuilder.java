@@ -2,6 +2,7 @@ package ua.bolt.twitterbot.print;
 
 import ua.bolt.twitterbot.domain.Market;
 import ua.bolt.twitterbot.domain.MarketType;
+import ua.bolt.twitterbot.domain.RatePair;
 
 import java.util.Collections;
 import java.util.EnumMap;
@@ -12,10 +13,9 @@ import java.util.Map;
  */
 public class MessageBuilder {
 
-    private static final String CURR_FORMAT =
-              "%s - %s / %s %s" +
-            "\n%s - %s / %s %s" +
-            "\n%s - %s / %s %s";
+    private static final String CURR_FORMAT       = "%s - %s / %s %s";
+    private static final String SHORT_CURR_FORMAT = "%s - %s %s";
+
     public static final String NEW_LINE = "\n";
 
     private static Map<MarketType, String> SOURCES = initSources();
@@ -23,8 +23,9 @@ public class MessageBuilder {
         Map<MarketType, String> result = new EnumMap<>(MarketType.class);
 
         result.put(MarketType.INTERBANK_MARKET,    "Рыночные курсы via minfin.com.ua");
-        result.put(MarketType.INTERBANK_OFFICIAL,  "Банковские курсы via minfin.com.ua");
+        result.put(MarketType.INTERBANK_OFFICIAL,  "Межбанковские курсы via minfin.com.ua");
         result.put(MarketType.BLACK_MARKET,        "Чёрный рынок via http://finance.ua");
+        result.put(MarketType.NBU,                 "Курсы НБУ via http://bank.gov.ua");
 
         return Collections.unmodifiableMap(result);
     }
@@ -36,6 +37,7 @@ public class MessageBuilder {
         result.put(MarketType.INTERBANK_MARKET,    "#гривна #межбанк #заторубльвжопе");
         result.put(MarketType.INTERBANK_OFFICIAL,  "#гривна #межбанк #заторубльвжопе");
         result.put(MarketType.BLACK_MARKET,        "#гривна #насамомделе #заторубльвжопе");
+        result.put(MarketType.NBU,                 "#гривна #НБУ #заторубльвжопе");
 
         return Collections.unmodifiableMap(result);
     }
@@ -43,30 +45,37 @@ public class MessageBuilder {
 
 
     public String buildForMarket (Market market, Market previousMarket) {
+
+        if (previousMarket == null)
+            previousMarket = market;
+
         return new StringBuilder()
                 .append(resolveSource(market.type))
                 .append(NEW_LINE)
-                .append(String.format(
-                            CURR_FORMAT
-
-                            , market.eur.currency.symbol
-                            , spacerAddingIfNeeded(market.eur.buy.value)
-                            , spacerAddingIfNeeded(market.eur.sell.value)
-                            , previousMarket != null ? market.eur.getGrowing(previousMarket.eur).symbol : " "
-
-                            , market.usd.currency.symbol
-                            , spacerAddingIfNeeded(market.usd.buy.value)
-                            , spacerAddingIfNeeded(market.usd.sell.value)
-                            , previousMarket != null ? market.usd.getGrowing(previousMarket.usd).symbol : " "
-
-                            , market.rub.currency.symbol
-                            , spacerAddingIfNeeded(market.rub.buy.value)
-                            , spacerAddingIfNeeded(market.rub.sell.value)
-                            , previousMarket != null ? market.rub.getGrowing(previousMarket.rub).symbol : " "
-                        ))
+                .append(pairToString(market.eur, previousMarket.eur))
+                .append(NEW_LINE)
+                .append(pairToString(market.usd, previousMarket.usd))
+                .append(NEW_LINE)
+                .append(pairToString(market.rub, previousMarket.rub))
                 .append(NEW_LINE)
                 .append(resolveTags(market.type))
                 .toString();
+    }
+
+    private String pairToString (RatePair pair, RatePair previousPair) {
+        return pair.buy.value.equals(pair.sell.value) ?
+                String.format(
+                    SHORT_CURR_FORMAT
+                    , pair.currency.symbol
+                    , spacerAddingIfNeeded(pair.buy.value)
+                    , pair.getGrowing(previousPair).symbol)
+                :
+                String.format(
+                    CURR_FORMAT
+                    , pair.currency.symbol
+                    , spacerAddingIfNeeded(pair.buy.value)
+                    , spacerAddingIfNeeded(pair.sell.value)
+                    , pair.getGrowing(previousPair).symbol);
     }
 
     private String resolveTags(MarketType type) {

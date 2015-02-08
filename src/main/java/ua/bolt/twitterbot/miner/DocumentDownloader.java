@@ -3,8 +3,10 @@ package ua.bolt.twitterbot.miner;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import twitter4j.Logger;
+import ua.bolt.twitterbot.Constants;
 
 import java.io.IOException;
+import java.net.SocketTimeoutException;
 import java.net.URL;
 import java.util.*;
 
@@ -28,10 +30,18 @@ public enum DocumentDownloader {
 
     public Document downloadDocument (String url) throws IOException {
 
-        Document result = Jsoup.connect(url).userAgent(getRandomAgent()).get();
+        Document result = null;
 
-//        if(result != null)
-//            LOG.info("Page downloaded successfully.");
+        try {
+            result = Jsoup.connect(url).userAgent(getRandomAgent()).get();
+
+        } catch (SocketTimeoutException ex) {
+            LOG.warn("Connection problem. SocketTimeoutException had a place. Retrying...");
+            try {
+                Thread.currentThread().sleep(Constants.RATE_UPDATING_PERIOD_INTERBANK);
+            } catch (InterruptedException e){}
+            result = Jsoup.connect(url).userAgent(getRandomAgent()).get();
+        }
 
         return result;
     }

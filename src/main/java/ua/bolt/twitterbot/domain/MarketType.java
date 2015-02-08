@@ -9,7 +9,8 @@ public enum MarketType {
 
     BLACK_MARKET        (Constants.BLACK_MARKET_URL),
     INTERBANK_MARKET    (Constants.INTERBANK_MARKET_URL),
-    INTERBANK_OFFICIAL  (Constants.INTERBANK_MARKET_URL);
+    INTERBANK_OFFICIAL  (Constants.INTERBANK_MARKET_URL),
+    NBU                 ("");
 
     public final String URL;
 

@@ -20,6 +20,7 @@ public class Constants {
     public static final String CACHE_FILE_INTERBANK         = "/home/curr-bot/cache_interbank";
     public static final String CACHE_FILE_INTERBANKMARKET   = "/home/curr-bot/cache_interbank_market";
     public static final String CACHE_FILE_BLACKMARKET       = "/home/curr-bot/cache_blackmarket";
+    public static final String CACHE_FILE_NBU               = "/home/curr-bot/cache_nbu";
 
 
     public static final int RATE_UPDATING_PERIOD_INTERBANK      = 15 * 60 * 1000; // 15 mins
