@@ -25,7 +25,7 @@ public class InterbankOffMiner implements Miningable {
 
     protected static final String URL = Constants.INTERBANK_MARKET_URL;
 
-    private static final String TABLE_KEY = Constants.TABLE_KEY_OFF;
+    private static final String TABLE_KEY = "mb-data";
 
     protected DocumentDownloader downloader = DocumentDownloader.Instance;
 
@@ -56,9 +56,7 @@ public class InterbankOffMiner implements Miningable {
 
         Elements tables = page.select("table");
         for (Element table : tables)
-            //<tr><td colspan="4"><h2>
-            for (Element h2: table.select("h2"))
-                if (h2.ownText().contains(tableKey))
+                if (table.className().equals(TABLE_KEY))
                     result = table;
 
         if (result == null)
