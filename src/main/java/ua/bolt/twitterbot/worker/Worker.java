@@ -2,7 +2,8 @@ package ua.bolt.twitterbot.worker;
 
 import twitter4j.Logger;
 import ua.bolt.twitterbot.CacheManager;
-import ua.bolt.twitterbot.Constants;
+import ua.bolt.twitterbot.prop.Names;
+import ua.bolt.twitterbot.prop.PropertyHolder;
 import ua.bolt.twitterbot.domain.Market;
 import ua.bolt.twitterbot.miner.Miningable;
 import ua.bolt.twitterbot.print.AbstractPrinter;
@@ -17,8 +18,11 @@ public class Worker implements Runnable {
     private static Logger LOG = Logger.getLogger(Worker.class);
 
     private int crashes = 0;
-    private final int crashesLimit = Constants.IS_DEBUUG ? 1 : Constants.CRASHES_LIMIT;
-    public volatile boolean isAlive = Constants.IS_DEBUUG ? false : true;
+    private final boolean IS_DEBUG = PropertyHolder.INSTANCE.getBool(Names.debug);
+    private final int crashesLimit = IS_DEBUG ?
+            1 :
+            PropertyHolder.INSTANCE.getInt(Names.crash_limit);
+    public volatile boolean isAlive = !IS_DEBUG;
 
     private AbstractPrinter printer;
     private Miningable miner;
@@ -29,7 +33,6 @@ public class Worker implements Runnable {
 
 
     public Worker(Miningable miner, AbstractPrinter printer, CacheManager cacheManager, Morpheus morpheus) {
-        this.printer = Constants.IS_DEBUUG ? new ConsolePrinter() : new TwitterPrinter();
         this.miner = miner;
         this.printer = printer;
         this.cacheManager = cacheManager;
@@ -87,7 +90,7 @@ public class Worker implements Runnable {
 
         } while(isAlive);
 
-        LOG.info("Loop ends because thread marked as dead. Debug mode is " + (Constants.IS_DEBUUG ? "ON" : "OFF"));
+        LOG.info("Loop ends because thread marked as dead.");
     }
 
 

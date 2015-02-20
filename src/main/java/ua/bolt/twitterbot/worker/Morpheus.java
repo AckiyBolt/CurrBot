@@ -3,7 +3,8 @@ package ua.bolt.twitterbot.worker;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import twitter4j.Logger;
-import ua.bolt.twitterbot.Constants;
+import ua.bolt.twitterbot.prop.Names;
+import ua.bolt.twitterbot.prop.PropertyHolder;
 import ua.bolt.twitterbot.domain.BankStatus;
 
 /**
@@ -12,6 +13,8 @@ import ua.bolt.twitterbot.domain.BankStatus;
 public class Morpheus {
 
     private static Logger LOG = Logger.getLogger(Morpheus.class);
+
+    private static final String TIMEZONE = PropertyHolder.INSTANCE.getStr(Names.timezone);
 
     private final int fromDay;
     private final int toDay;
@@ -45,9 +48,9 @@ public class Morpheus {
     private BankStatus guessBankStatus() {
         BankStatus result = BankStatus.WORKS;
 
-        if (Constants.IS_DEBUUG) return result;
+        if (PropertyHolder.INSTANCE.getBool(Names.debug)) return result;
 
-        DateTime now = DateTime.now(DateTimeZone.forID(Constants.TIMEZONE_ID));
+        DateTime now = DateTime.now(DateTimeZone.forID(TIMEZONE));
 
         // day
         if (now.getDayOfWeek() < fromDay || now.getDayOfWeek() > toDay )

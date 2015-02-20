@@ -2,27 +2,25 @@ package ua.bolt.twitterbot.miner;
 
 import com.google.gson.Gson;
 import twitter4j.Logger;
-import ua.bolt.twitterbot.Constants;
 import ua.bolt.twitterbot.domain.*;
 import ua.bolt.twitterbot.miner.ex.MinerEmptyException;
 
 import static ua.bolt.twitterbot.miner.Util.*;
 
 import java.io.IOException;
-import java.util.HashSet;
-import java.util.Set;
 
 /**
  * Created by ackiybolt on 25.12.14.
  */
 public class BlackMarketMiner implements Miningable {
 
+    private static final String BLACK_MARKET_URL = "http://resources.finance.ua/chart/data?for=currency-order&currency=";
     private static Logger LOG = Logger.getLogger(BlackMarketMiner.class);
 
     private static final MarketType type = MarketType.BLACK_MARKET;
 
     private Gson gson = new Gson();
-    private DocumentDownloader downloader = DocumentDownloader.Instance;
+    private DocumentDownloader downloader = DocumentDownloader.INSTANCE;
 
     @Override
     public Market mineRates() throws MinerEmptyException {
@@ -33,9 +31,9 @@ public class BlackMarketMiner implements Miningable {
         String rub = null;
 
         try {
-            eur = downloader.downloadRawData(Constants.BLACK_MARKET_URL + Currency.EUR);
-            usd = downloader.downloadRawData(Constants.BLACK_MARKET_URL + Currency.USD);
-            rub = downloader.downloadRawData(Constants.BLACK_MARKET_URL + Currency.RUB);
+            eur = downloader.downloadRawData(BLACK_MARKET_URL + Currency.EUR);
+            usd = downloader.downloadRawData(BLACK_MARKET_URL + Currency.USD);
+            rub = downloader.downloadRawData(BLACK_MARKET_URL + Currency.RUB);
 
         } catch (IOException ex) {
             LOG.error("Bad url. Can't download data.", ex);

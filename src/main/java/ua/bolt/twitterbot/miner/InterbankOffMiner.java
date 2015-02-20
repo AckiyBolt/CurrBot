@@ -4,7 +4,6 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import twitter4j.Logger;
-import ua.bolt.twitterbot.Constants;
 import ua.bolt.twitterbot.domain.*;
 import ua.bolt.twitterbot.miner.ex.MinerEmptyException;
 import ua.bolt.twitterbot.miner.ex.PageChangedException;
@@ -23,11 +22,10 @@ public class InterbankOffMiner implements Miningable {
     private static Logger LOG = Logger.getLogger(InterbankOffMiner.class);
 
 
-    protected static final String URL = Constants.INTERBANK_MARKET_URL;
-
+    private static final String URL = "http://minfin.com.ua/currency/mb/";
     private static final String TABLE_KEY = "mb-data";
 
-    protected DocumentDownloader downloader = DocumentDownloader.Instance;
+    protected DocumentDownloader downloader = DocumentDownloader.INSTANCE;
 
     @Override
     public Market mineRates() throws MinerEmptyException {

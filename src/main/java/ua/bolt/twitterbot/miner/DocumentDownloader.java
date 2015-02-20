@@ -3,7 +3,8 @@ package ua.bolt.twitterbot.miner;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import twitter4j.Logger;
-import ua.bolt.twitterbot.Constants;
+import ua.bolt.twitterbot.prop.Names;
+import ua.bolt.twitterbot.prop.PropertyHolder;
 
 import java.io.IOException;
 import java.net.SocketTimeoutException;
@@ -15,10 +16,10 @@ import java.util.*;
  */
 public enum DocumentDownloader {
 
-    Instance;
+    INSTANCE;
 
     private static Logger LOG = Logger.getLogger(DocumentDownloader.class);
-
+    private static int RETRY_TIME = PropertyHolder.INSTANCE.getInt(Names.short_period);
 
     private Random rnd;
     private List<String> userAgents;
@@ -38,7 +39,7 @@ public enum DocumentDownloader {
         } catch (SocketTimeoutException ex) {
             LOG.warn("Connection problem. SocketTimeoutException had a place. Retrying...");
             try {
-                Thread.currentThread().sleep(Constants.RATE_UPDATING_PERIOD_INTERBANK);
+                Thread.currentThread().sleep(RETRY_TIME);
             } catch (InterruptedException e){}
             result = Jsoup.connect(url).userAgent(getRandomAgent()).get();
         }

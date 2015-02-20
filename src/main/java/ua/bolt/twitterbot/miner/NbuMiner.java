@@ -20,7 +20,7 @@ public class NbuMiner implements Miningable  {
 
     private static Logger LOG = Logger.getLogger(NbuMiner.class);
 
-    private DocumentDownloader downloader = DocumentDownloader.Instance;
+    private DocumentDownloader downloader = DocumentDownloader.INSTANCE;
     private static final String URL       = "http://www.bank.gov.ua/control/uk/index";
     private static final String TABLE_KEY = "Офіційний курс гривні до іноземних валют";
 
