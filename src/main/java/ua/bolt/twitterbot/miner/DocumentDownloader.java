@@ -9,7 +9,10 @@ import ua.bolt.twitterbot.prop.PropertyHolder;
 import java.io.IOException;
 import java.net.SocketTimeoutException;
 import java.net.URL;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Random;
 
 /**
  * Created by ackiybolt on 25.12.14.
@@ -19,7 +22,9 @@ public enum DocumentDownloader {
     INSTANCE;
 
     private static Logger LOG = Logger.getLogger(DocumentDownloader.class);
-    private static int RETRY_TIME = PropertyHolder.INSTANCE.getInt(Names.short_period);
+    private static int RETRY_TIME = PropertyHolder.INSTANCE.getInt(Names.min_15);
+    private static int RETRY_COUNT = PropertyHolder.INSTANCE.getInt(Names.doc_download_tries);
+    private static int JSOUP_TIMEOUT = PropertyHolder.INSTANCE.getInt(Names.doc_download_timeout);
 
     private Random rnd;
     private List<String> userAgents;
@@ -30,18 +35,30 @@ public enum DocumentDownloader {
     }
 
     public Document downloadDocument (String url) throws IOException {
+        return downloadDocument(url, RETRY_COUNT, RETRY_TIME);
+    }
 
+    public Document downloadDocument (String url, int tries, int period) throws IOException {
         Document result = null;
 
         try {
-            result = Jsoup.connect(url).userAgent(getRandomAgent()).get();
+            result = Jsoup.connect(url)
+                    .timeout(JSOUP_TIMEOUT)
+                    .ignoreHttpErrors(false)
+                    .userAgent(getRandomAgent()).get();
 
         } catch (SocketTimeoutException ex) {
-            LOG.warn("Connection problem. SocketTimeoutException had a place. Retrying...");
+
+            LOG.warn("Connection problem. SocketTimeoutException had a place while download:\n"
+                    + url
+                    + "\nRetrying...");
+
             try {
-                Thread.currentThread().sleep(RETRY_TIME);
-            } catch (InterruptedException e){}
-            result = Jsoup.connect(url).userAgent(getRandomAgent()).get();
+                Thread.currentThread().sleep(period);
+            } catch (InterruptedException e) {}
+
+            if (tries > 1)
+                downloadDocument(url, --tries, period);
         }
 
         return result;

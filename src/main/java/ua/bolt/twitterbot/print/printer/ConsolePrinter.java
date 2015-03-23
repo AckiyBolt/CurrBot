@@ -1,9 +1,9 @@
-package ua.bolt.twitterbot.print;
+package ua.bolt.twitterbot.print.printer;
 
 /**
  * Created by ackiybolt on 24.12.14.
  */
-public class ConsolePrinter extends AbstractPrinter {
+public class ConsolePrinter implements Printer {
 
     @Override
     public void print(String message) throws RuntimeException {

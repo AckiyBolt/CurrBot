@@ -5,12 +5,15 @@ package ua.bolt.twitterbot.prop;
  */
 public class Names {
     public static String debug = "is.debug";
-    public static String file_interbank = "cache.file.interbank";
-    public static String file_blackmarket = "cache.file.blackmarket";
-    public static String file_nbu = "cache.file.nbu";
     public static String timezone = "timezone";
-    public static String short_period = "period.15";
-    public static String normal_period = "period.30";
-    public static String long_period = "period.60";
+
+    public static String min_5 = "min.5";
+    public static String min_15 = "min.15";
+    public static String min_30 = "min.30";
+    public static String min_60 = "min.60";
+
     public static String crash_limit = "crash_limit";
+    public static String doc_download_tries = "doc.download.tries";
+    public static String cache_file = "cache.file";
+    public static String doc_download_timeout = "doc.download.timeout";
 }

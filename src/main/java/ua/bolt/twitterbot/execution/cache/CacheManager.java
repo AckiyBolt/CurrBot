@@ -1,13 +1,11 @@
-package ua.bolt.twitterbot;
+package ua.bolt.twitterbot.execution.cache;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonSyntaxException;
 import twitter4j.Logger;
-import ua.bolt.twitterbot.domain.Market;
 
 import java.io.*;
-import java.util.Set;
 
 /**
  * Created by ackiybolt on 25.12.14.
@@ -24,9 +22,9 @@ public class CacheManager {
         this.cacheFile = cacheFile;
     }
 
-    public Market readCache () {
+    public CacheHolder readCache () {
 
-        Market result = null;
+        CacheHolder result = null;
         String content = null;
 
         try {
@@ -40,7 +38,7 @@ public class CacheManager {
 
         if (content != null && !content.isEmpty())
             try {
-                result = gson.fromJson(content, Market.class);
+                result = gson.fromJson(content, CacheHolder.class);
 
             } catch (JsonSyntaxException ex) {
                 LOG.warn("Can't parse JSON. ", ex.toString());
@@ -49,7 +47,7 @@ public class CacheManager {
         return result;
     }
 
-    public void updateCache(Market market) {
+    public void updateCache(CacheHolder market) {
 
         String content = gson.toJson(market);
 
@@ -79,7 +77,7 @@ public class CacheManager {
         return sb.toString();
     }
 
-    public void writeContent(String content) throws FileNotFoundException, UnsupportedEncodingException {
+    private void writeContent(String content) throws FileNotFoundException, UnsupportedEncodingException {
 
         try (PrintWriter writer = new PrintWriter(cacheFile, "UTF-8")) {
             writer.println(content);

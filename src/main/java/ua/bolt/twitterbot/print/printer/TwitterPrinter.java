@@ -1,4 +1,4 @@
-package ua.bolt.twitterbot.print;
+package ua.bolt.twitterbot.print.printer;
 
 import twitter4j.Logger;
 import twitter4j.Twitter;
@@ -8,7 +8,7 @@ import twitter4j.TwitterFactory;
 /**
  * Created by ackiybolt on 24.12.14.
  */
-public class TwitterPrinter extends AbstractPrinter {
+public class TwitterPrinter implements Printer {
 
     private static Logger LOG = Logger.getLogger(TwitterPrinter.class);
 

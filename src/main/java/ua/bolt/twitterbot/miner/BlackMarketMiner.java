@@ -5,9 +5,10 @@ import twitter4j.Logger;
 import ua.bolt.twitterbot.domain.*;
 import ua.bolt.twitterbot.miner.ex.MinerEmptyException;
 
-import static ua.bolt.twitterbot.miner.Util.*;
-
 import java.io.IOException;
+
+import static ua.bolt.twitterbot.miner.Util.isExist;
+import static ua.bolt.twitterbot.miner.Util.parseAndFormatDouble;
 
 /**
  * Created by ackiybolt on 25.12.14.
@@ -21,6 +22,11 @@ public class BlackMarketMiner implements Miningable {
 
     private Gson gson = new Gson();
     private DocumentDownloader downloader = DocumentDownloader.INSTANCE;
+
+    @Override
+    public MarketType getType() {
+        return MarketType.BLACK_MARKET;
+    }
 
     @Override
     public Market mineRates() throws MinerEmptyException {

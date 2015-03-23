@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 
-import static ua.bolt.twitterbot.miner.Util.*;
+import static ua.bolt.twitterbot.miner.Util.parseAndFormatDouble;
 
 /**
  * Created by ackiybolt on 20.12.14.
@@ -26,6 +26,11 @@ public class InterbankOffMiner implements Miningable {
     private static final String TABLE_KEY = "mb-data";
 
     protected DocumentDownloader downloader = DocumentDownloader.INSTANCE;
+
+    @Override
+    public MarketType getType() {
+        return MarketType.INTERBANK_OFFICIAL;
+    }
 
     @Override
     public Market mineRates() throws MinerEmptyException {
