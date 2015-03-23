@@ -26,7 +26,9 @@ public class Main {
         setup
                 .loadCache()
                 .createAndRunCacheUpdaterAgent()
-                .createAndRunCurrentAgents();
+                .createAndRunCurrentAgents()
+                .createAndRunDailyAgent()
+                .createAndRunWeeklyAgent();
 
         LOG.info("Bot started.");
     }

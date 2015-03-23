@@ -44,15 +44,15 @@ public abstract class AbstractDeltaPrintingService extends AbstractPrintingServi
     private String createDelta(RatePair pair, RatePair previousPair) {
         return String.format(getCurrencyTemplate(),
                 pair.currency.symbol,
-                pair.getGrowing(previousPair).symbol,
+                previousPair.getGrowing(pair).symbol,
                 calcDelta(pair, previousPair)
         );
     }
 
     private double calcDelta(RatePair pair, RatePair previousPair) {
-        return Util.formatDouble(
-                ((pair.buy.value + pair.sell.value) / 2)
-                        - ((previousPair.buy.value + previousPair.sell.value) / 2)
+        return Math.abs(Util.formatDouble(
+                ((previousPair.buy.value + previousPair.sell.value) / 2)
+                -((pair.buy.value + pair.sell.value) / 2))
         );
     }
 
@@ -63,6 +63,6 @@ public abstract class AbstractDeltaPrintingService extends AbstractPrintingServi
     protected abstract String getCurrencyTemplate();
 
     protected String getTags(MarketType type) {
-        return type.tags + "#хуёваядельта";
+        return type.tags + " #хуёваядельта";
     }
 }

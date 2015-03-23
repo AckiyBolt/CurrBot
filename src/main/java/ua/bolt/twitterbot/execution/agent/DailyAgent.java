@@ -1,5 +1,6 @@
 package ua.bolt.twitterbot.execution.agent;
 
+import ua.bolt.twitterbot.execution.TimeUtil;
 import ua.bolt.twitterbot.execution.cache.CacheHolder;
 import ua.bolt.twitterbot.print.service.DailyPrintingService;
 
@@ -18,7 +19,9 @@ public class DailyAgent implements Runnable {
 
     @Override
     public void run() {
-        printingService.printMarket(cache);
-        cache.updateDailyMarkets();
+        if (TimeUtil.getNow().dayOfWeek().get() <= 5) {
+            printingService.printMarket(cache);
+            cache.updateDailyMarkets();
+        }
     }
 }

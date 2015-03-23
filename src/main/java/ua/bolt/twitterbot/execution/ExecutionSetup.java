@@ -3,6 +3,8 @@ package ua.bolt.twitterbot.execution;
 import twitter4j.Logger;
 import ua.bolt.twitterbot.execution.agent.CacheUpdaterAgent;
 import ua.bolt.twitterbot.execution.agent.CurrentAgent;
+import ua.bolt.twitterbot.execution.agent.DailyAgent;
+import ua.bolt.twitterbot.execution.agent.WeeklyAgent;
 import ua.bolt.twitterbot.execution.cache.CacheHolder;
 import ua.bolt.twitterbot.execution.cache.CacheManager;
 import ua.bolt.twitterbot.miner.BlackMarketMiner;
@@ -73,7 +75,7 @@ public class ExecutionSetup {
         checkCacheHolder();
 
         scheduledExecutorService.scheduleWithFixedDelay(
-                new CurrentAgent(new NbuMiner(), cacheHolder), 0, 1, TimeUnit.HOURS);
+                new DailyAgent(cacheHolder), TimeUtil.hoursTillEndOfDay(), 24, TimeUnit.HOURS);
 
         return this;
     }
@@ -82,7 +84,7 @@ public class ExecutionSetup {
         checkCacheHolder();
 
         scheduledExecutorService.scheduleWithFixedDelay(
-                new CurrentAgent(new NbuMiner(), cacheHolder), 0, 1, TimeUnit.HOURS);
+                new WeeklyAgent(cacheHolder), TimeUtil.hoursTillEndOfWeek(), 168, TimeUnit.HOURS);
 
         return this;
     }
