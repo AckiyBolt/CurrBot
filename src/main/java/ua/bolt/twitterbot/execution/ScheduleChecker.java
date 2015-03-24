@@ -26,7 +26,7 @@ public enum ScheduleChecker {
     public boolean isTimeForWork (MarketType marketType) {
 
         boolean result = false;
-        DateTime now = DateTime.now();
+        DateTime now = TimeUtil.getNow();
         
         
         Schedule schedule = schedules.get(marketType);
