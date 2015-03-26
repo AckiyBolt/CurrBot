@@ -16,7 +16,7 @@ public class TimeUtil {
         DateTime now = getNow();
 
         int result = hoursTillEndOfDay();
-        result += (7 - 3 - now.dayOfWeek().get()) * 24;
+        result += (7 - 2 - now.dayOfWeek().get()) * 24;
 
         if(result < 0) {
             result = 0;
