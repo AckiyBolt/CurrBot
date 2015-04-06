@@ -56,7 +56,7 @@ public enum ScheduleChecker {
         for (int i = 1; i <= 7; i++)
             result.dayOfWeeks[i] = 1;
 
-        for (int i = 8; i <= 20; i++)
+        for (int i = 9; i <= 19; i++)
             result.hours[i] = 1;
 
         return result;
