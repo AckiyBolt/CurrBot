@@ -50,6 +50,8 @@ public class CurrentAgent implements Runnable {
 
         } catch (MinerEmptyException ex) {
             LOG.warn("Market " + marketType + " is empty.");
+        } catch (Exception ex) {
+            LOG.error(String.format("Something gone wrong in %s agent.", marketType), ex);
         }
     }
 }
