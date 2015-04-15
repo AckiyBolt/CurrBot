@@ -1,24 +1,24 @@
 package ua.bolt.twitterbot.execution.agent;
 
 import ua.bolt.twitterbot.execution.cache.CacheHolder;
-import ua.bolt.twitterbot.execution.cache.CacheManager;
+import ua.bolt.twitterbot.print.service.FilePrintingService;
 import ua.bolt.twitterbot.prop.Names;
 import ua.bolt.twitterbot.prop.PropertyHolder;
 
 /**
- * Created by ackiybolt on 12.03.15.
+ * Created by ackiybolt on 15.04.15.
  */
-public class CacheUpdaterAgent implements Runnable, UpdatableAgent {
+public class FilePrintAgent implements Runnable, UpdatableAgent {
 
-    private CacheManager manager;
     private CacheHolder holder;
 
-    private volatile boolean isChanged;
+    private FilePrintingService printingService;
+    private volatile boolean isChanged = true;
     private volatile boolean isAlive = true;
     private final int SLEEP_PERIOD = PropertyHolder.INSTANCE.getInt(Names.min_5);
 
-    public CacheUpdaterAgent(CacheHolder holder) {
-        manager = new CacheManager(PropertyHolder.INSTANCE.getStr(Names.cache_file));
+    public FilePrintAgent(CacheHolder holder) {
+        this.printingService = new FilePrintingService();
         this.holder = holder;
     }
 
@@ -26,7 +26,7 @@ public class CacheUpdaterAgent implements Runnable, UpdatableAgent {
     public void run() {
         while (isAlive) {
             if (isChanged) {
-                manager.updateCache(holder);
+                printingService.printMarket(holder);
                 isChanged = false;
             }
 
@@ -47,4 +47,5 @@ public class CacheUpdaterAgent implements Runnable, UpdatableAgent {
     public void holderChanged() {
         isChanged = true;
     }
+
 }

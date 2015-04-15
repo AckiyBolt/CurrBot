@@ -26,6 +26,7 @@ public class Main {
         setup
                 .loadCache()
                 .createAndRunCacheUpdaterAgent()
+                .createAndRunFilePrinterAgent()
                 .createAndRunCurrentAgents()
                 .createAndRunDailyAgent()
                 .createAndRunWeeklyAgent();

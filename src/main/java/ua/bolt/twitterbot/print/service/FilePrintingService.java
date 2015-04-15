@@ -1,44 +1,59 @@
 package ua.bolt.twitterbot.print.service;
 
-
 import ua.bolt.twitterbot.domain.Market;
 import ua.bolt.twitterbot.domain.MarketType;
 import ua.bolt.twitterbot.domain.RatePair;
 import ua.bolt.twitterbot.execution.cache.CacheHolder;
+import ua.bolt.twitterbot.print.printer.ConsolePrinter;
+import ua.bolt.twitterbot.print.printer.FilePrinter;
+import ua.bolt.twitterbot.print.printer.TwitterPrinter;
+import ua.bolt.twitterbot.prop.Names;
+import ua.bolt.twitterbot.prop.PropertyHolder;
 
 /**
- * Created by ackiybolt on 22.03.15.
+ * Created by ackiybolt on 15.04.15.
  */
-public class CurrentPrintingService extends AbstractPrintingService {
+public class FilePrintingService extends AbstractPrintingService {
 
     private static final String CURR_FORMAT       = "%s - %s / %s %s";
     private static final String SHORT_CURR_FORMAT = "%s - %s %s";
 
     private static final String MSG_TEMPLATE =
             "%s via %s\n" +     // name, source
-            "%s\n" +            // eur
-            "%s\n" +            // usd
-            "%s\n" +            // rub
-            "%s";               // tags
+                    "%s\n" +            // eur
+                    "%s\n" +            // usd
+                    "%s";               // rub
+    private static final String TAG = "#ХуёвыйМежбанк";
 
-    private MarketType marketType;
-
-    public CurrentPrintingService(MarketType marketType) {
-        this.marketType = marketType;
+    public FilePrintingService() {
+        super();
+        this.printer = IS_DEBUG ? new ConsolePrinter() : new FilePrinter();;
     }
 
     @Override
     public void printMarket(CacheHolder cacheHolder) {
 
-        Market current = cacheHolder.getCurrent(marketType);
-        Market previous = cacheHolder.getPrevious(marketType);
+        StringBuilder stringBuilder = new StringBuilder();
 
-        String message = createMessage(current, previous);
+        for (MarketType type: MarketType.values()) {
+            stringBuilder
+                    .append(printMarket(cacheHolder, type))
+                    .append("\n");
+        }
+        stringBuilder.append(TAG);
 
-        printer.print(message);
+        printer.print(stringBuilder.toString());
     }
 
-    protected String createMessage(Market current, Market previous) {
+    private String printMarket(CacheHolder cacheHolder, MarketType type) {
+
+        Market current = cacheHolder.getCurrent(type);
+        Market previous = cacheHolder.getPrevious(type);
+
+        return createMessage(current, previous);
+    }
+
+    private String createMessage(Market current, Market previous) {
         MarketType type = current.type;
 
         if (previous == null) {
@@ -49,12 +64,11 @@ public class CurrentPrintingService extends AbstractPrintingService {
                 type.name, type.source,
                 pairToString(current.eur, previous.eur),
                 pairToString(current.usd, previous.usd),
-                pairToString(current.rub, previous.rub),
-                type.tags
+                pairToString(current.rub, previous.rub)
         );
     }
 
-    protected String pairToString (RatePair pair, RatePair previousPair) {
+    private String pairToString (RatePair pair, RatePair previousPair) {
         return pair.buy.value.equals(pair.sell.value) ?
                 String.format(
                         SHORT_CURR_FORMAT

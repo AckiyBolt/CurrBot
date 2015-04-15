@@ -1,10 +1,7 @@
 package ua.bolt.twitterbot.execution;
 
 import twitter4j.Logger;
-import ua.bolt.twitterbot.execution.agent.CacheUpdaterAgent;
-import ua.bolt.twitterbot.execution.agent.CurrentAgent;
-import ua.bolt.twitterbot.execution.agent.DailyAgent;
-import ua.bolt.twitterbot.execution.agent.WeeklyAgent;
+import ua.bolt.twitterbot.execution.agent.*;
 import ua.bolt.twitterbot.execution.cache.CacheHolder;
 import ua.bolt.twitterbot.execution.cache.CacheManager;
 import ua.bolt.twitterbot.miner.BlackMarketMiner;
@@ -50,8 +47,18 @@ public class ExecutionSetup {
         checkCacheHolder();
 
         CacheUpdaterAgent cacheUpdaterAgent = new CacheUpdaterAgent(cacheHolder);
-        cacheHolder.setUpdateAgent(cacheUpdaterAgent);
+        cacheHolder.addUpdatableAgent(cacheUpdaterAgent);
         new Thread(cacheUpdaterAgent).start();
+
+        return this;
+    }
+
+    public ExecutionSetup createAndRunFilePrinterAgent() {
+        checkCacheHolder();
+
+        FilePrintAgent filePrintAgent = new FilePrintAgent(cacheHolder);
+        cacheHolder.addUpdatableAgent(filePrintAgent);
+        new Thread(filePrintAgent).start();
 
         return this;
     }

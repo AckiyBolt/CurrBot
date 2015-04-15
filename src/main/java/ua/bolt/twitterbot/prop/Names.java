@@ -15,5 +15,6 @@ public class Names {
     public static String crash_limit = "crash_limit";
     public static String doc_download_tries = "doc.download.tries";
     public static String cache_file = "cache.file";
+    public static String print_file = "print.file";
     public static String doc_download_timeout = "doc.download.timeout";
 }

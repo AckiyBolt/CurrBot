@@ -3,8 +3,10 @@ package ua.bolt.twitterbot.execution.cache;
 import com.google.gson.annotations.Expose;
 import ua.bolt.twitterbot.domain.Market;
 import ua.bolt.twitterbot.domain.MarketType;
-import ua.bolt.twitterbot.execution.agent.CacheUpdaterAgent;
+import ua.bolt.twitterbot.execution.agent.UpdatableAgent;
 
+import java.util.HashSet;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -18,29 +20,30 @@ public class CacheHolder {
     private ConcurrentHashMap<MarketType, Market> previousDay;
     private ConcurrentHashMap<MarketType, Market> previousWeek;
 
-    transient private CacheUpdaterAgent updateAgent;
+    transient private Set<UpdatableAgent> updatableAgents;
 
     public CacheHolder() {
         current = new ConcurrentHashMap<>();
         previous = new ConcurrentHashMap<>();
         previousDay = new ConcurrentHashMap<>();
         previousWeek = new ConcurrentHashMap<>();
+        updatableAgents = new HashSet<>();
     }
 
-    public void setUpdateAgent(CacheUpdaterAgent updateAgent) {
-        this.updateAgent = updateAgent;
+    public void addUpdatableAgent(UpdatableAgent updatableAgent) {
+        this.updatableAgents.add(updatableAgent);
     }
 
     public void updateCurrentMarket(Market market) {
         current.put(market.type, market);
 
-        sandUpdateNotification();
+        sendUpdateNotification();
     }
 
     public void updatePreviousMarket(Market market) {
         previous.put(market.type, market);
 
-        sandUpdateNotification();
+        sendUpdateNotification();
     }
 
     public void updateDailyMarkets() {
@@ -48,7 +51,7 @@ public class CacheHolder {
             updateDayMarket(type);
         }
 
-        sandUpdateNotification();
+        sendUpdateNotification();
     }
 
     private void updateDayMarket(MarketType type) {
@@ -63,7 +66,7 @@ public class CacheHolder {
             updateWeekMarket(type);
         }
 
-        sandUpdateNotification();
+        sendUpdateNotification();
     }
 
     private void updateWeekMarket(MarketType type) {
@@ -89,8 +92,10 @@ public class CacheHolder {
         return previousWeek.get(type);
     }
 
-    private void sandUpdateNotification() {
-        if (updateAgent != null && updateAgent.isAlive())
-            updateAgent.holderChanged();
+    private void sendUpdateNotification() {
+        for (UpdatableAgent agent: updatableAgents) {
+            if (agent != null && agent.isAlive())
+                agent.holderChanged();
+        }
     }
 }

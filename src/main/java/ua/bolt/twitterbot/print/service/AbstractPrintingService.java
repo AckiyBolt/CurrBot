@@ -12,7 +12,7 @@ import ua.bolt.twitterbot.prop.PropertyHolder;
  */
 public abstract class AbstractPrintingService {
 
-    private final boolean IS_DEBUG = PropertyHolder.INSTANCE.getBool(Names.debug);
+    protected final boolean IS_DEBUG = PropertyHolder.INSTANCE.getBool(Names.debug);
 
     protected Printer printer;
 

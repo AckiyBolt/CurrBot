@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonSyntaxException;
 import twitter4j.Logger;
+import ua.bolt.twitterbot.FileManager;
 
 import java.io.*;
 
@@ -13,7 +14,6 @@ import java.io.*;
 public class CacheManager {
 
     private static Logger LOG = Logger.getLogger(CacheManager.class);
-
 
     private String cacheFile;
     private Gson gson = new GsonBuilder().setPrettyPrinting().create();
@@ -25,16 +25,7 @@ public class CacheManager {
     public CacheHolder readCache () {
 
         CacheHolder result = null;
-        String content = null;
-
-        try {
-            content = readContent(cacheFile);
-
-        } catch (FileNotFoundException ex) {
-            LOG.warn("Can't find cache file. ", ex.toString());
-        } catch (IOException ex) {
-            LOG.warn("Can't read cache file. ", ex.toString());
-        }
+        String content = FileManager.readContent(cacheFile);
 
         if (content != null && !content.isEmpty())
             try {
@@ -51,36 +42,6 @@ public class CacheManager {
 
         String content = gson.toJson(market);
 
-        try {
-            writeContent(content);
-
-        } catch (FileNotFoundException ex) {
-            LOG.warn("Can't find cache file. Skipped. ", ex.getMessage());
-        } catch (UnsupportedEncodingException ex) {
-            LOG.warn("Encoding problems. Skipped. ", ex.getMessage());
-        }
-    }
-
-    private String readContent(String path) throws IOException {
-
-        StringBuilder sb = new StringBuilder();
-
-        try(BufferedReader br = new BufferedReader(new FileReader(path))) {
-            String line = br.readLine();
-
-            while (line != null) {
-                sb.append(line);
-                sb.append(System.lineSeparator());
-                line = br.readLine();
-            }
-        }
-        return sb.toString();
-    }
-
-    private void writeContent(String content) throws FileNotFoundException, UnsupportedEncodingException {
-
-        try (PrintWriter writer = new PrintWriter(cacheFile, "UTF-8")) {
-            writer.println(content);
-        }
+        FileManager.writeContent(content, cacheFile);
     }
 }
