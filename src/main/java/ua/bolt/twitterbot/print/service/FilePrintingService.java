@@ -23,7 +23,9 @@ public class FilePrintingService extends AbstractPrintingService {
                     "%s\n" +            // eur
                     "%s\n" +            // usd
                     "%s";               // rub
-    private static final String TAG = "#ХуёвыйМежбанк";
+    private static final String TAG =
+            "#ХуёвыйМежбанк\n" +
+            "https://twitter.com/hu_mezhbank";
 
     public FilePrintingService() {
         super();
