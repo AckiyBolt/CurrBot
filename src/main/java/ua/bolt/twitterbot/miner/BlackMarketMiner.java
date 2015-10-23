@@ -18,8 +18,6 @@ public class BlackMarketMiner implements Miningable {
     private static final String BLACK_MARKET_URL = "http://resources.finance.ua/chart/data?for=currency-order&currency=";
     private static Logger LOG = Logger.getLogger(BlackMarketMiner.class);
 
-    private static final MarketType type = MarketType.BLACK_MARKET;
-
     private Gson gson = new Gson();
     private DocumentDownloader downloader = DocumentDownloader.INSTANCE;
 
@@ -47,7 +45,7 @@ public class BlackMarketMiner implements Miningable {
 
         if (isExist(eur) && isExist(usd) && isExist(rub))
             result = new Market(
-                    type,
+                    getType(),
                     parseRatePair(eur, Currency.EUR),
                     parseRatePair(usd, Currency.USD),
                     parseRatePair(rub, Currency.RUB));

@@ -1,5 +1,6 @@
 package ua.bolt.twitterbot.miner;
 
+import com.google.gson.Gson;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
@@ -8,10 +9,13 @@ import ua.bolt.twitterbot.domain.*;
 import ua.bolt.twitterbot.miner.ex.MinerEmptyException;
 import ua.bolt.twitterbot.miner.ex.PageChangedException;
 
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
+import static ua.bolt.twitterbot.miner.Util.isExist;
 import static ua.bolt.twitterbot.miner.Util.parseAndFormatDouble;
 
 /**
@@ -19,11 +23,10 @@ import static ua.bolt.twitterbot.miner.Util.parseAndFormatDouble;
  */
 public class InterbankOffMiner implements Miningable {
 
-    private static Logger LOG = Logger.getLogger(InterbankOffMiner.class);
+    private static Logger LOG  = Logger.getLogger(InterbankOffMiner.class);
+    private        Gson   gson = new Gson();
 
-
-    private static final String URL = "http://minfin.com.ua/currency/mb/";
-    private static final String TABLE_KEY = "mb-data";
+    private static final String URL_TEMPLATE = "http://minfin.com.ua/data/currency/ib/%s.ib.today.json";
 
     protected DocumentDownloader downloader = DocumentDownloader.INSTANCE;
 
@@ -34,113 +37,75 @@ public class InterbankOffMiner implements Miningable {
 
     @Override
     public Market mineRates() throws MinerEmptyException {
-
         Market result = null;
 
+        String eur = null;
+        String usd = null;
+        String rub = null;
+
         try {
-            Document page = downloader.downloadDocument(URL);
+            eur = downloader.downloadRawData(String.format(URL_TEMPLATE, Currency.EUR.toString().toLowerCase()));
+            usd = downloader.downloadRawData(String.format(URL_TEMPLATE, Currency.USD.toString().toLowerCase()));
+            rub = downloader.downloadRawData(String.format(URL_TEMPLATE, Currency.RUB.toString().toLowerCase()));
 
-            Element table = findTableWithRates(page, TABLE_KEY);
-            result = createMarket(MarketType.INTERBANK_OFFICIAL, parseTable(table));
-
-
-        } catch (Exception ex) {
-            LOG.error("Can't mine rates. Fix me!", ex);
-            throw new MinerEmptyException(ex);
+        } catch (IOException ex) {
+            LOG.error("Bad url. Can't download data.", ex);
         }
+
+        if (isExist(eur) && isExist(usd) && isExist(rub))
+            result = new Market(
+                   getType(),
+                   parseRatePair(eur, Currency.EUR),
+                   parseRatePair(usd, Currency.USD),
+                   parseRatePair(rub, Currency.RUB));
+
 
         return result;
     }
 
+    public RatePair parseRatePair(String page, Currency currency) {
+        RatePair result =  null;
 
+        Entry[] data = prepareRawData(page);
+        Double buy = null;
+        Double sell = null;
 
-    protected Element findTableWithRates(Document page, String tableKey) {
-        Element result = null;
+        for (int i = data.length - 1; i != 0; i--) {
+            try {
+                buy = parseAndFormatDouble(data[i].bid);
+                sell = parseAndFormatDouble(data[i].ask);
+                break;
 
-        Elements tables = page.select("table");
-        for (Element table : tables)
-                if (table.className().equals(TABLE_KEY))
-                    result = table;
-
-        if (result == null)
-            throw new PageChangedException();
-
-        return result;
-    }
-
-
-
-    protected Set<RatePair> parseTable(Element table) {
-        ArrayList<String> currencies = new ArrayList<String>(3);
-        ArrayList<String> ratesBuy = new ArrayList<String>(3);
-        ArrayList<String> ratesSell = new ArrayList<String>(3);
-
-        parseRates(table, ratesBuy, ratesSell);
-        parseCurrencies(table, currencies);
-
-        return parseRatePairs(currencies, ratesBuy, ratesSell);
-    }
-
-    private void parseRates(Element table, ArrayList<String> ratesBuy, ArrayList<String> ratesSell) {
-        for (Element td : table.select("td"))
-            if (!td.ownText().isEmpty() && td.ownText().matches("[.\\d]+"))
-                if (ratesBuy.size() < 3)
-                    ratesBuy.add(td.ownText());
-                else
-                    ratesSell.add(td.ownText());
-    }
-
-    private void parseCurrencies(Element table, ArrayList<String> currencies) {
-        for(Element th : table.select("th")) {
-            if (th.children().size() != 0)
-                currencies.add(th.child(0).ownText());
-        }
-    }
-
-    private Set<RatePair> parseRatePairs(
-            ArrayList<String> currencies,
-            ArrayList<String> ratesBuy,
-            ArrayList<String> ratesSell) {
-
-        Set<RatePair> pairs = new HashSet<RatePair>();
-
-        for (int i = 0; i < currencies.size(); i++) {
-            String currVal = currencies.get(i);
-            String buyVal = ratesBuy.get(i);
-            String sellVal = ratesSell.get(i);
-
-            pairs.add(createRatePair(currVal, buyVal, sellVal));
-        }
-
-        return pairs;
-    }
-
-    private RatePair createRatePair(String currVal, String buyVal, String sellVal) {
-        return new RatePair(
-                Currency.valueOf(currVal),
-                new Rate(
-                        parseAndFormatDouble(buyVal),
-                        RateType.BUY),
-                new Rate(
-                        parseAndFormatDouble(sellVal),
-                        RateType.SELL));
-    }
-
-
-
-    protected Market createMarket(MarketType type, Set<RatePair> pairs) {
-
-        RatePair eur = null;
-        RatePair usd = null;
-        RatePair rub = null;
-
-        for (RatePair pair: pairs)
-            switch (pair.currency) {
-                case EUR: eur = pair; break;
-                case USD: usd = pair; break;
-                case RUB: rub = pair; break;
+            } catch (NullPointerException | ArrayIndexOutOfBoundsException ex) {
+                // do nothing
             }
+        }
 
-        return new Market(type, eur, usd, rub);
+        if (buy != null && sell != null)
+            result = new RatePair(
+                   currency,
+                   new Rate(buy, RateType.BUY),
+                   new Rate(sell, RateType.SELL));
+
+        return result;
+    }
+
+    private Entry[] prepareRawData(String rawData) {
+        return gson.fromJson(rawData, Entry[].class);
+    }
+
+    private static class Entry {
+        private String date;
+        private String bid;
+        private String ask;
+
+        @Override
+        public String toString() {
+            return "Entry{" +
+                   "date='" + date + '\'' +
+                   ", bid='" + bid + '\'' +
+                   ", ask='" + ask + '\'' +
+                   '}';
+        }
     }
 }
